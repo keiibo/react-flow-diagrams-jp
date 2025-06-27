@@ -2,12 +2,26 @@ import { INode } from "@/types";
 import { IFlowTheme } from "@/types/theme";
 import { defaultTheme } from "@/themes";
 
+/**
+ * ノードのサイズ情報を表すインターフェース
+ */
 export interface NodeSize {
+  /** ノードの幅（ピクセル） */
   width: number;
+  /** ノードの高さ（ピクセル） */
   height: number;
 }
 
-export const getNodeSize = (node: INode, theme: IFlowTheme = defaultTheme): NodeSize => {
+/**
+ * ノードのサイズを計算します
+ * @param node 対象のノード
+ * @param theme 使用するテーマ。デフォルトはdefaultTheme
+ * @returns 計算されたノードサイズ
+ */
+export const getNodeSize = (
+  node: INode,
+  theme: IFlowTheme = defaultTheme
+): NodeSize => {
   // ノードに明示的にサイズが指定されている場合はそれを使用
   if (node.width && node.height) {
     return {
@@ -20,12 +34,16 @@ export const getNodeSize = (node: INode, theme: IFlowTheme = defaultTheme): Node
 
   switch (node.shape || "rectangle") {
     case "circle":
-    case "square":
-      const squareSize = Math.max(theme.node.defaultSize.width, theme.node.defaultSize.height);
+    case "square": {
+      const squareSize = Math.max(
+        theme.node.defaultSize.width,
+        theme.node.defaultSize.height
+      );
       return {
         width: squareSize + padding * 2,
         height: squareSize + padding * 2,
       };
+    }
     case "rounded":
     case "rectangle":
     default:
@@ -36,6 +54,13 @@ export const getNodeSize = (node: INode, theme: IFlowTheme = defaultTheme): Node
   }
 };
 
+/**
+ * ノードのスタイルを生成します
+ * @param node 対象のノード
+ * @param isDragging ドラッグ中かどうか。デフォルトはfalse
+ * @param theme 使用するテーマ。デフォルトはdefaultTheme
+ * @returns ノードのCSSスタイル
+ */
 export const getNodeStyles = (
   node: INode,
   isDragging: boolean = false,
@@ -49,8 +74,8 @@ export const getNodeStyles = (
     top: node.position.y,
     padding: `${theme.node.padding}px`,
     background: theme.colors.surface,
-    border: node.selected 
-      ? `2px solid ${theme.colors.state.selected}` 
+    border: node.selected
+      ? `2px solid ${theme.colors.state.selected}`
       : `1px solid ${theme.colors.border}`,
     width: `${size.width}px`,
     height: `${size.height}px`,

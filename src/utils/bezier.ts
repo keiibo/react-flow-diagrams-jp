@@ -1,11 +1,28 @@
 import { IPosition } from "@/types";
 
+/**
+ * ベジェ曲線のパス情報を表すインターフェース
+ */
 export interface BezierPath {
+  /** SVGパス文字列 */
   path: string;
+  /** ラベル表示用のX座標 */
   labelX: number;
+  /** ラベル表示用のY座標 */
   labelY: number;
 }
 
+/**
+ * 2つの点を結ぶベジェ曲線のパスを生成します
+ * @param sourceX 開始点のX座標
+ * @param sourceY 開始点のY座標
+ * @param sourcePosition 開始点のハンドル位置
+ * @param targetX 終了点のX座標
+ * @param targetY 終了点のY座標
+ * @param targetPosition 終了点のハンドル位置
+ * @param curvature 曲線の曲率（0-1）。デフォルトは0.25
+ * @returns ベジェ曲線のパス情報
+ */
 export const getBezierPath = (
   sourceX: number,
   sourceY: number,
@@ -46,6 +63,18 @@ export const getBezierPath = (
   };
 };
 
+/**
+ * 2つの点を結ぶスムーズステップパス（角丸の段階的な線）を生成します
+ * @param sourceX 開始点のX座標
+ * @param sourceY 開始点のY座標
+ * @param sourcePosition 開始点のハンドル位置
+ * @param targetX 終了点のX座標
+ * @param targetY 終了点のY座標
+ * @param targetPosition 終了点のハンドル位置
+ * @param borderRadius 角丸の半径。デフォルトは5
+ * @param offset ハンドルからのオフセット距離。デフォルトは20
+ * @returns スムーズステップパスの情報
+ */
 export const getSmoothStepPath = (
   sourceX: number,
   sourceY: number,
@@ -97,6 +126,15 @@ export const getSmoothStepPath = (
   };
 };
 
+/**
+ * ハンドル位置に基づいてベジェ曲線の制御点を計算します
+ * @param x 基準点のX座標
+ * @param y 基準点のY座標
+ * @param position ハンドルの位置
+ * @param curvature 曲線の曲率
+ * @param offset オプション：カスタムオフセット距離
+ * @returns 制御点の座標 [x, y]
+ */
 const getControlPoint = (
   x: number,
   y: number,
@@ -120,6 +158,16 @@ const getControlPoint = (
   }
 };
 
+/**
+ * ノードのハンドル位置の座標を計算します
+ * @param nodeX ノードのX座標
+ * @param nodeY ノードのY座標
+ * @param nodeWidth ノードの幅
+ * @param nodeHeight ノードの高さ
+ * @param handlePosition ハンドルの位置
+ * @param handleOffset ハンドルのオフセット距離。デフォルトは5
+ * @returns ハンドルの座標
+ */
 export const getHandlePosition = (
   nodeX: number,
   nodeY: number,
@@ -142,6 +190,15 @@ export const getHandlePosition = (
   }
 };
 
+/**
+ * 4次ベジェ曲線上の指定されたパラメータ位置の点を計算します
+ * @param p0 開始点
+ * @param p1 第1制御点
+ * @param p2 第2制御点
+ * @param p3 終了点
+ * @param t パラメータ（0-1）。0が開始点、1が終了点
+ * @returns ベジェ曲線上の点の座標
+ */
 export const getBezierPoint = (
   p0: { x: number; y: number },
   p1: { x: number; y: number },

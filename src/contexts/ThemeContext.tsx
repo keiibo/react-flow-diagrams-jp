@@ -1,5 +1,9 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
-import { IFlowTheme, IFlowThemePartial, IFlowThemeContext } from "@/types/theme";
+import {
+  IFlowTheme,
+  IFlowThemePartial,
+  IFlowThemeContext,
+} from "@/types/theme";
 import { defaultTheme } from "@/themes";
 
 /**
@@ -23,12 +27,12 @@ interface ThemeProviderProps {
  */
 function deepMerge(target: IFlowTheme, source: IFlowThemePartial): IFlowTheme {
   const result = { ...target } as IFlowTheme;
-  
+
   for (const key in source) {
     if (source[key as keyof IFlowThemePartial] !== undefined) {
       const sourceValue = source[key as keyof IFlowThemePartial];
       const targetValue = target[key as keyof IFlowTheme];
-      
+
       if (
         typeof sourceValue === "object" &&
         sourceValue !== null &&
@@ -43,14 +47,14 @@ function deepMerge(target: IFlowTheme, source: IFlowThemePartial): IFlowTheme {
       }
     }
   }
-  
+
   return result;
 }
 
 /**
  * テーマプロバイダー
  * フロー図のテーマを管理するコンテキストプロバイダー
- * 
+ *
  * @example
  * ```tsx
  * <ThemeProvider initialTheme={darkTheme}>
@@ -78,24 +82,22 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   };
 
   return (
-    <ThemeContext.Provider value={value}>
-      {children}
-    </ThemeContext.Provider>
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
   );
 };
 
 /**
  * テーマフック
  * フロー図コンポーネント内でテーマを使用するためのフック
- * 
+ *
  * @returns テーマコンテキストの値
  * @throws {Error} ThemeProvider外で使用された場合
- * 
+ *
  * @example
  * ```tsx
  * function MyComponent() {
  *   const { theme, setTheme } = useFlowTheme();
- *   
+ *
  *   return (
  *     <div style={{ color: theme.colors.text.primary }}>
  *       Hello World
@@ -106,25 +108,25 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
  */
 export const useFlowTheme = (): IFlowThemeContext => {
   const context = useContext(ThemeContext);
-  
+
   if (context === undefined) {
     throw new Error("useFlowTheme must be used within a ThemeProvider");
   }
-  
+
   return context;
 };
 
 /**
  * テーマを安全に取得するフック
  * ThemeProvider外でも使用可能で、その場合はデフォルトテーマを返す
- * 
+ *
  * @returns 現在のテーマまたはデフォルトテーマ
- * 
+ *
  * @example
  * ```tsx
  * function MyComponent() {
  *   const theme = useFlowThemeSafe();
- *   
+ *
  *   return (
  *     <div style={{ color: theme.colors.text.primary }}>
  *       Hello World
