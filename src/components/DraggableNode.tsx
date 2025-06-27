@@ -1,13 +1,29 @@
 import React, { useCallback, useRef, useState } from "react";
 import { INode as NodeType, IPosition } from "@/types";
 
+/**
+ * ドラッグ可能ノードコンポーネントのプロパティ
+ */
 interface DraggableNodeProps {
+  /** ドラッグ対象のノード */
   node: NodeType;
+  /** ノード位置変更時のコールバック関数 */
   onNodeChange?: (nodeId: string, position: IPosition) => void;
+  /** ノードクリック時のコールバック関数 */
   onClick?: (event: React.MouseEvent, node: NodeType) => void;
+  /** ビューポート情報 */
   viewport: { x: number; y: number; zoom: number };
 }
 
+/**
+ * ドラッグ可能ノードコンポーネント
+ *
+ * マウスドラッグによる移動機能を持つノードコンポーネントです。
+ * ビューポートのズームと座標変換を考慮した正確な位置計算を行います。
+ *
+ * @param props - ドラッグ可能ノードのプロパティ
+ * @returns ドラッグ可能なノード要素
+ */
 const DraggableNode: React.FC<DraggableNodeProps> = ({
   node,
   onNodeChange,

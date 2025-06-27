@@ -3,19 +3,37 @@ import { INode as NodeType, IPosition } from "@/types";
 import { getNodeStyles } from "@/utils";
 import Handle from "./Handle";
 
+/**
+ * ハンドル付きノードコンポーネントのプロパティ
+ */
 interface NodeWithHandlesProps {
+  /** 表示するノード */
   node: NodeType;
+  /** ノード位置変更時のコールバック関数 */
   onNodeChange?: (nodeId: string, position: IPosition) => void;
+  /** ノードクリック時のコールバック関数 */
   onClick?: (event: React.MouseEvent, node: NodeType) => void;
+  /** 接続開始時のコールバック関数 */
   onConnectionStart?: (
     nodeId: string,
     handleId: string,
     position: IPosition
   ) => void;
+  /** 接続終了時のコールバック関数 */
   onConnectionEnd?: (nodeId: string, handleId: string) => void;
+  /** ビューポート情報 */
   viewport: { x: number; y: number; zoom: number };
 }
 
+/**
+ * ハンドル付きノードコンポーネント
+ *
+ * 4方向のハンドルを持ち、ドラッグ移動と接続機能をサポートするノードです。
+ * ビューポート座標変換とドラッグ検出機能を内蔵しています。
+ *
+ * @param props - ハンドル付きノードのプロパティ
+ * @returns ハンドル付きのノード要素
+ */
 const NodeWithHandles: React.FC<NodeWithHandlesProps> = ({
   node,
   onNodeChange,

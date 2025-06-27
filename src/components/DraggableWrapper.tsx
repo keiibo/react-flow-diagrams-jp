@@ -1,25 +1,45 @@
 import React, { useCallback, useRef, useState } from "react";
 import { INode as NodeType, IPosition } from "@/types";
 
+/**
+ * ドラッグ可能ラッパーコンポーネントのプロパティ
+ */
 interface DraggableWrapperProps {
+  /** ドラッグ対象のノード */
   node: NodeType;
+  /** ノード位置変更時のコールバック関数 */
   onNodeChange?: (nodeId: string, position: IPosition) => void;
+  /** ノードクリック時のコールバック関数 */
   onClick?: (event: React.MouseEvent, node: NodeType) => void;
+  /** 接続開始時のコールバック関数 */
   onConnectionStart?: (
     nodeId: string,
     handleId: string,
     handleType: "source" | "target",
     position: IPosition
   ) => void;
+  /** 接続終了時のコールバック関数 */
   onConnectionEnd?: (
     nodeId: string,
     handleId: string,
     handleType: "source" | "target"
   ) => void;
+  /** ビューポート情報 */
   viewport: { x: number; y: number; zoom: number };
+  /** ラップする子要素 */
   children: React.ReactNode;
 }
 
+/**
+ * ドラッグ可能ラッパーコンポーネント
+ *
+ * 任意の子要素をドラッグ可能にするラッパーコンポーネントです。
+ * インタラクティブ要素（input、button等）のドラッグを自動的に無効化し、
+ * .nodragクラスを持つ要素もドラッグ対象から除外します。
+ *
+ * @param props - ドラッグ可能ラッパーのプロパティ
+ * @returns ドラッグ機能を持つラッパー要素
+ */
 const DraggableWrapper: React.FC<DraggableWrapperProps> = ({
   node,
   onNodeChange,

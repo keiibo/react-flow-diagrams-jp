@@ -2,20 +2,40 @@ import React, { useCallback, useState } from "react";
 import { INode, IPosition, TNodeTypes } from "@/types";
 import NodeWithHandles from "./NodeWithHandles";
 
+/**
+ * ノードレンダラーコンポーネントのプロパティ
+ */
 interface NodeRendererProps {
+  /** レンダリングするノード */
   node: INode;
+  /** カスタムノードタイプの定義 */
   nodeTypes?: TNodeTypes;
+  /** ノード位置変更時のコールバック関数 */
   onNodeChange?: (nodeId: string, position: IPosition) => void;
+  /** ノードクリック時のコールバック関数 */
   onClick?: (event: React.MouseEvent, node: INode) => void;
+  /** 接続開始時のコールバック関数 */
   onConnectionStart?: (
     nodeId: string,
     handleId: string,
     position: IPosition
   ) => void;
+  /** 接続終了時のコールバック関数 */
   onConnectionEnd?: (nodeId: string, handleId: string) => void;
+  /** ビューポート情報 */
   viewport: { x: number; y: number; zoom: number };
 }
 
+/**
+ * ノードレンダラーコンポーネント
+ *
+ * ノードのタイプに応じて適切なノードコンポーネントを選択し、
+ * ドラッグ機能とイベントハンドリングを管理します。
+ * カスタムノードタイプとデフォルトノードの両方をサポートします。
+ *
+ * @param props - ノードレンダラーのプロパティ
+ * @returns 適切なノードコンポーネント
+ */
 const NodeRenderer: React.FC<NodeRendererProps> = ({
   node,
   nodeTypes,
