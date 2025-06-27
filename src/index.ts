@@ -9,7 +9,7 @@ export { default as BezierEdge } from "./components/BezierEdge";
 
 // 基本ノードコンポーネント（カスタムノード作成の参考用）
 export { default as DefaultNode } from "./components/DefaultNode";
-export { ImageNode } from "./components/nodeTypes/ImageNode";
+// 注：ImageNode機能はDefaultNodeに統合されました。type="image"で画像ノードとして使用できます。
 
 // 型定義
 export type {

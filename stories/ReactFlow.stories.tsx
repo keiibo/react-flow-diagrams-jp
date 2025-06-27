@@ -7,7 +7,7 @@ import {
   greenTheme,
   purpleTheme,
   lightTheme,
-  ImageNode,
+  DefaultNode,
 } from "../src";
 import { INode, IEdge, IImageNodeData } from "../src/types";
 
@@ -1301,7 +1301,7 @@ export const ImageNodes: Story = {
       },
     ],
     nodeTypes: {
-      image: ImageNode,
+      image: DefaultNode,
     },
     theme: lightTheme,
   },
@@ -1359,7 +1359,7 @@ export const ImageErrorHandling: Story = {
       },
     ],
     nodeTypes: {
-      image: ImageNode,
+      image: DefaultNode,
     },
     theme: lightTheme,
   },
@@ -1471,7 +1471,7 @@ export const ImageCustomization: Story = {
       },
     ],
     nodeTypes: {
-      image: ImageNode,
+      image: DefaultNode,
     },
     theme: lightTheme,
   },

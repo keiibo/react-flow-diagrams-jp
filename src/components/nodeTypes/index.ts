@@ -1,5 +1,4 @@
-import DefaultNode from "../DefaultNode";
-import { ImageNode } from "./ImageNode";
+// 現在はDefaultNodeに画像機能を統合したため、特別なImageNodeは不要
+// type="image"を指定することでDefaultNodeが画像として動作する
 
-// 個別エクスポート
-export { DefaultNode, ImageNode };
+export { default as DefaultNode } from "../DefaultNode";
