@@ -9,6 +9,7 @@ export { default as BezierEdge } from "./components/BezierEdge";
 
 // 基本ノードコンポーネント（カスタムノード作成の参考用）
 export { default as DefaultNode } from "./components/DefaultNode";
+export { ImageNode } from "./components/nodeTypes/ImageNode";
 
 // 型定義
 export type {
@@ -31,6 +32,7 @@ export type {
   IHandle,
   IViewport,
   IDimensions,
+  IImageNodeData,
 } from "./types";
 
 // フック（メインフック推奨）

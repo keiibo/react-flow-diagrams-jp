@@ -1,4 +1,26 @@
 /**
+ * 画像ノードのデータを表すインターフェース
+ */
+export interface IImageNodeData {
+  /** 画像のURL */
+  imageUrl: string;
+  /** 画像の代替テキスト */
+  alt?: string;
+  /** ノードのラベル（画像の下に表示） */
+  label?: string;
+  /** 画像のフィット方法 */
+  objectFit?: "contain" | "cover" | "fill" | "none" | "scale-down";
+  /** 画像の幅（ピクセル） */
+  imageWidth?: number;
+  /** 画像の高さ（ピクセル） */
+  imageHeight?: number;
+  /** 画像の角丸設定 */
+  borderRadius?: number;
+  /** 画像の不透明度 */
+  opacity?: number;
+}
+
+/**
  * 2D座標位置を表すインターフェース
  */
 export interface IPosition {
@@ -212,7 +234,7 @@ export interface IFlowProps {
   /** カスタムノードタイプの定義 */
   nodeTypes?: TNodeTypes;
   /** カスタムテーマ設定 */
-  theme?: import('./theme').IFlowThemePartial;
+  theme?: import("./theme").IFlowThemePartial;
   /** 追加のCSSクラス名 */
   className?: string;
   /** 追加のインラインスタイル */
