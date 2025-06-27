@@ -2,14 +2,31 @@ import React, { useState, useRef, useEffect } from "react";
 import { IEdge as EdgeType, INode } from "@/types";
 import { getBezierPath, getHandlePosition, getNodeSize } from "@/utils";
 
+/**
+ * ベジェエッジコンポーネントのプロパティ
+ */
 interface BezierEdgeProps {
+  /** 描画するエッジの情報 */
   edge: EdgeType;
+  /** エッジの開始ノード */
   sourceNode: INode;
+  /** エッジの終了ノード */
   targetNode: INode;
+  /** エッジクリック時のコールバック関数 */
   onClick?: (event: React.MouseEvent, edge: EdgeType) => void;
+  /** エッジラベル変更時のコールバック関数 */
   onLabelChange?: (edgeId: string, newLabel: string) => void;
 }
 
+/**
+ * ベジェ曲線エッジコンポーネント
+ *
+ * 2つのノード間をベジェ曲線で接続し、編集可能なラベルと矢印マーカーを持つエッジです。
+ * ラベルのダブルクリックによる編集機能とクリック選択機能をサポートします。
+ *
+ * @param props - ベジェエッジのプロパティ
+ * @returns ベジェ曲線エッジを表すSVG group要素
+ */
 const BezierEdge: React.FC<BezierEdgeProps> = ({
   edge,
   sourceNode,
