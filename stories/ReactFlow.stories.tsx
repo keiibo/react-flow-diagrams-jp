@@ -1,8 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { FlowCanvas } from "../src";
+import React, { useState } from "react";
+import {
+  FlowCanvas,
+  darkTheme,
+  blueTheme,
+  greenTheme,
+  purpleTheme,
+} from "../src";
 import { INode, IEdge } from "../src/types";
-import { useState } from "react";
-import React from "react";
 
 const meta: Meta<typeof FlowCanvas> = {
   title: "Components/FlowCanvas",
@@ -682,5 +687,517 @@ export const InteractiveHandleOffsets: StoryObj = {
   },
   args: {
     handleOffset: 5,
+  },
+};
+
+// テーマストーリー
+
+export const DarkTheme: Story = {
+  args: {
+    ...Default.args,
+    theme: darkTheme,
+  },
+};
+
+export const BlueTheme: Story = {
+  args: {
+    ...Default.args,
+    theme: blueTheme,
+  },
+};
+
+export const GreenTheme: Story = {
+  args: {
+    ...Default.args,
+    theme: greenTheme,
+  },
+};
+
+export const PurpleTheme: Story = {
+  args: {
+    ...Default.args,
+    theme: purpleTheme,
+  },
+};
+
+export const CustomTheme: Story = {
+  args: {
+    ...Default.args,
+    theme: {
+      name: "custom",
+      colors: {
+        primary: "#ff6b6b",
+        background: "#2c3e50",
+        surface: "#34495e",
+        border: "#7f8c8d",
+        text: {
+          primary: "#ecf0f1",
+          secondary: "#bdc3c7",
+        },
+        state: {
+          selected: "#e74c3c",
+          hover: "#c0392b",
+        },
+        handle: {
+          default: "#e67e22",
+        },
+        grid: {
+          line: "#34495e",
+        },
+      },
+    },
+  },
+};
+
+export const ThemeComparison: StoryObj = {
+  render: () => {
+    const nodes: INode[] = [
+      {
+        id: "1",
+        position: { x: 100, y: 100 },
+        data: { label: "Node 1" },
+      },
+      {
+        id: "2",
+        position: { x: 300, y: 100 },
+        data: { label: "Node 2" },
+      },
+    ];
+
+    const edges: IEdge[] = [
+      {
+        id: "e1-2",
+        source: "1",
+        target: "2",
+        data: { label: "connection" },
+      },
+    ];
+
+    return (
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "20px",
+          height: "100vh",
+        }}
+      >
+        <div>
+          <h3 style={{ margin: "10px", textAlign: "center", color: "#333" }}>
+            Light Theme
+          </h3>
+          <div
+            style={{ height: "calc(50vh - 40px)", border: "1px solid #ccc" }}
+          >
+            <FlowCanvas nodes={nodes} edges={edges} />
+          </div>
+        </div>
+        <div>
+          <h3 style={{ margin: "10px", textAlign: "center", color: "#333" }}>
+            Dark Theme
+          </h3>
+          <div
+            style={{ height: "calc(50vh - 40px)", border: "1px solid #ccc" }}
+          >
+            <FlowCanvas nodes={nodes} edges={edges} theme={darkTheme} />
+          </div>
+        </div>
+        <div>
+          <h3 style={{ margin: "10px", textAlign: "center", color: "#333" }}>
+            Blue Theme
+          </h3>
+          <div
+            style={{ height: "calc(50vh - 40px)", border: "1px solid #ccc" }}
+          >
+            <FlowCanvas nodes={nodes} edges={edges} theme={blueTheme} />
+          </div>
+        </div>
+        <div>
+          <h3 style={{ margin: "10px", textAlign: "center", color: "#333" }}>
+            Green Theme
+          </h3>
+          <div
+            style={{ height: "calc(50vh - 40px)", border: "1px solid #ccc" }}
+          >
+            <FlowCanvas nodes={nodes} edges={edges} theme={greenTheme} />
+          </div>
+        </div>
+      </div>
+    );
+  },
+};
+
+interface CustomizableThemeArgs {
+  primaryColor: string;
+  backgroundColor: string;
+  surfaceColor: string;
+  borderColor: string;
+  textPrimaryColor: string;
+  textSecondaryColor: string;
+  nodeSpacing: number;
+  borderRadius: number;
+  fontSize: string;
+  fontFamily: string;
+  nodeWidth: number;
+  nodeHeight: number;
+  handleSize: number;
+  handleOffset: number;
+  edgeStrokeWidth: number;
+}
+
+export const CustomizableTheme: StoryObj<CustomizableThemeArgs> = {
+  argTypes: {
+    // 基本カラー
+    primaryColor: {
+      control: { type: "color" },
+      description: "プライマリカラー（選択状態など）",
+    },
+    backgroundColor: {
+      control: { type: "color" },
+      description: "キャンバス背景色",
+    },
+    surfaceColor: {
+      control: { type: "color" },
+      description: "ノード背景色",
+    },
+    borderColor: {
+      control: { type: "color" },
+      description: "ボーダー色",
+    },
+    textPrimaryColor: {
+      control: { type: "color" },
+      description: "メインテキスト色",
+    },
+    textSecondaryColor: {
+      control: { type: "color" },
+      description: "サブテキスト色",
+    },
+
+    // スペーシング
+    nodeSpacing: {
+      control: { type: "range", min: 4, max: 24, step: 2 },
+      description: "ノード内パディング",
+      defaultValue: 10,
+    },
+
+    // ボーダー半径
+    borderRadius: {
+      control: { type: "range", min: 0, max: 20, step: 2 },
+      description: "ボーダー半径",
+      defaultValue: 4,
+    },
+
+    // フォント設定
+    fontSize: {
+      control: { type: "select" },
+      options: ["12px", "14px", "16px", "18px"],
+      description: "フォントサイズ",
+      defaultValue: "14px",
+    },
+    fontFamily: {
+      control: { type: "select" },
+      options: [
+        "system-ui, sans-serif",
+        "Inter, sans-serif",
+        "Roboto, sans-serif",
+        "Arial, sans-serif",
+        "Georgia, serif",
+        "monospace",
+      ],
+      description: "フォントファミリー",
+      defaultValue: "system-ui, sans-serif",
+    },
+
+    // ノード設定
+    nodeWidth: {
+      control: { type: "range", min: 80, max: 200, step: 10 },
+      description: "デフォルトノード幅",
+      defaultValue: 140,
+    },
+    nodeHeight: {
+      control: { type: "range", min: 40, max: 120, step: 10 },
+      description: "デフォルトノード高さ",
+      defaultValue: 70,
+    },
+
+    // ハンドル設定
+    handleSize: {
+      control: { type: "range", min: 4, max: 16, step: 1 },
+      description: "ハンドルサイズ",
+      defaultValue: 8,
+    },
+    handleOffset: {
+      control: { type: "range", min: 0, max: 20, step: 1 },
+      description: "ハンドルオフセット",
+      defaultValue: 5,
+    },
+
+    // エッジ設定
+    edgeStrokeWidth: {
+      control: { type: "range", min: 1, max: 6, step: 1 },
+      description: "エッジの太さ",
+      defaultValue: 2,
+    },
+  },
+
+  render: (args: CustomizableThemeArgs) => {
+    const customTheme: any = {
+      name: "customizable",
+      colors: {
+        primary: args.primaryColor,
+        secondary: "#6c757d",
+        background: args.backgroundColor,
+        surface: args.surfaceColor,
+        border: args.borderColor,
+        borderHover: args.primaryColor,
+        text: {
+          primary: args.textPrimaryColor,
+          secondary: args.textSecondaryColor,
+          disabled: "#adb5bd",
+        },
+        state: {
+          selected: args.primaryColor,
+          hover: args.primaryColor,
+          dragging: args.primaryColor,
+          connecting: args.primaryColor,
+          error: "#dc3545",
+          success: "#28a745",
+        },
+        edge: {
+          default: args.borderColor,
+          selected: args.primaryColor,
+          hover: args.primaryColor,
+          animated: args.primaryColor,
+        },
+        handle: {
+          default: args.primaryColor,
+          connectable: "#28a745",
+          connecting: args.primaryColor,
+        },
+        grid: {
+          line: args.borderColor,
+          dot: args.borderColor,
+        },
+      },
+      spacing: {
+        xs: 2,
+        sm: args.nodeSpacing / 2,
+        md: args.nodeSpacing,
+        lg: args.nodeSpacing * 2,
+        xl: args.nodeSpacing * 3,
+        xxl: args.nodeSpacing * 4,
+      },
+      borderRadius: {
+        none: 0,
+        sm: args.borderRadius,
+        md: args.borderRadius * 2,
+        lg: args.borderRadius * 3,
+        xl: args.borderRadius * 4,
+        full: "50%",
+      },
+      shadows: {
+        none: "none",
+        sm: "0 1px 3px rgba(0, 0, 0, 0.1)",
+        md: "0 2px 4px rgba(0, 0, 0, 0.1)",
+        lg: "0 4px 8px rgba(0, 0, 0, 0.15)",
+        xl: "0 8px 16px rgba(0, 0, 0, 0.2)",
+      },
+      typography: {
+        fontFamily: args.fontFamily,
+        fontSize: {
+          xs: `${parseInt(args.fontSize) - 4}px`,
+          sm: `${parseInt(args.fontSize) - 2}px`,
+          md: args.fontSize,
+          lg: `${parseInt(args.fontSize) + 2}px`,
+          xl: `${parseInt(args.fontSize) + 4}px`,
+        },
+        fontWeight: {
+          normal: 400,
+          medium: 500,
+          bold: 700,
+        },
+        lineHeight: {
+          tight: 1.2,
+          normal: 1.4,
+          relaxed: 1.6,
+        },
+      },
+      node: {
+        defaultSize: {
+          width: args.nodeWidth,
+          height: args.nodeHeight,
+        },
+        minSize: {
+          width: 60,
+          height: 40,
+        },
+        padding: args.nodeSpacing,
+        handleOffset: args.handleOffset,
+        handleSize: args.handleSize,
+      },
+      edge: {
+        strokeWidth: args.edgeStrokeWidth,
+        strokeWidthSelected: args.edgeStrokeWidth + 1,
+        animationDuration: 2000,
+        labelPadding: 4,
+      },
+      controls: {
+        buttonSize: 32,
+        iconSize: 16,
+        position: {
+          bottom: 20,
+          right: 20,
+        },
+      },
+    };
+
+    const [nodes, setNodes] = useState<INode[]>([
+      {
+        id: "theme1",
+        position: { x: 100, y: 100 },
+        data: { label: "カスタマイズ可能テーマ" },
+        shape: "rectangle" as const,
+      },
+      {
+        id: "theme2",
+        position: { x: 350, y: 100 },
+        data: { label: "リアルタイム反映" },
+        shape: "rounded" as const,
+        selected: true,
+      },
+      {
+        id: "theme3",
+        position: { x: 600, y: 100 },
+        data: { label: "完全制御" },
+        shape: "circle" as const,
+      },
+      {
+        id: "theme4",
+        position: { x: 100, y: 250 },
+        data: { label: "デザイン自由" },
+        shape: "square" as const,
+      },
+      {
+        id: "theme5",
+        position: { x: 350, y: 250 },
+        data: { label: "プロジェクト統合" },
+        shape: "rounded" as const,
+      },
+      {
+        id: "theme6",
+        position: { x: 600, y: 250 },
+        data: { label: "美しいUI" },
+        shape: "circle" as const,
+      },
+      {
+        id: "theme7",
+        position: { x: 225, y: 400 },
+        data: { label: "統一感のあるデザイン" },
+        shape: "rectangle" as const,
+      },
+      {
+        id: "theme8",
+        position: { x: 475, y: 400 },
+        data: { label: "ユーザー体験向上" },
+        shape: "rounded" as const,
+      },
+    ]);
+
+    const [edges, setEdges] = useState<IEdge[]>([
+      {
+        id: "te1",
+        source: "theme1",
+        target: "theme2",
+        data: { label: "テーマ設定" },
+      },
+      {
+        id: "te2",
+        source: "theme2",
+        target: "theme3",
+        data: { label: "カラー調整" },
+      },
+      {
+        id: "te3",
+        source: "theme1",
+        target: "theme4",
+        data: { label: "サイズ変更" },
+      },
+      {
+        id: "te4",
+        source: "theme4",
+        target: "theme5",
+        data: { label: "フォント設定" },
+      },
+      {
+        id: "te5",
+        source: "theme5",
+        target: "theme6",
+        data: { label: "スタイル統合" },
+      },
+      {
+        id: "te6",
+        source: "theme3",
+        target: "theme6",
+        data: { label: "視覚的一貫性" },
+      },
+      {
+        id: "te7",
+        source: "theme4",
+        target: "theme7",
+        data: { label: "レイアウト最適化" },
+      },
+      {
+        id: "te8",
+        source: "theme5",
+        target: "theme7",
+        data: { label: "デザインシステム" },
+      },
+      {
+        id: "te9",
+        source: "theme6",
+        target: "theme8",
+        data: { label: "UX向上" },
+      },
+      {
+        id: "te10",
+        source: "theme7",
+        target: "theme8",
+        data: { label: "最終目標" },
+      },
+    ]);
+
+    return (
+      <FlowCanvas
+        nodes={nodes}
+        edges={edges}
+        theme={customTheme}
+        onNodesChange={setNodes}
+        onEdgesChange={setEdges}
+        onNodeClick={(event: React.MouseEvent, node: INode) => {
+          console.log("Node clicked:", node.id);
+        }}
+        onEdgeClick={(event: React.MouseEvent, edge: IEdge) => {
+          console.log("Edge clicked:", edge.id);
+        }}
+      />
+    );
+  },
+
+  args: {
+    primaryColor: "#007bff",
+    backgroundColor: "#f8f9fa",
+    surfaceColor: "#ffffff",
+    borderColor: "#dee2e6",
+    textPrimaryColor: "#212529",
+    textSecondaryColor: "#6c757d",
+    nodeSpacing: 10,
+    borderRadius: 4,
+    fontSize: "14px",
+    fontFamily: "system-ui, sans-serif",
+    nodeWidth: 140,
+    nodeHeight: 70,
+    handleSize: 8,
+    handleOffset: 5,
+    edgeStrokeWidth: 2,
   },
 };

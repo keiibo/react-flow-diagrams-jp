@@ -1,4 +1,5 @@
 import React from 'react';
+import { useFlowThemeSafe } from '@/contexts/ThemeContext';
 
 interface ControlsProps {
   onZoomIn: () => void;
@@ -15,34 +16,38 @@ const Controls: React.FC<ControlsProps> = ({
   onReset,
   zoom,
 }) => {
+  const theme = useFlowThemeSafe();
+
   const buttonStyle: React.CSSProperties = {
-    background: 'white',
-    border: '1px solid #ddd',
-    borderRadius: '4px',
-    padding: '8px 12px',
-    margin: '2px',
+    background: theme.colors.surface,
+    border: `1px solid ${theme.colors.border}`,
+    borderRadius: `${theme.borderRadius.sm}px`,
+    padding: `${theme.spacing.sm}px ${theme.spacing.md}px`,
+    margin: `${theme.spacing.xs}px`,
     cursor: 'pointer',
-    fontSize: '12px',
-    fontWeight: 'bold',
-    color: '#333',
+    fontSize: theme.typography.fontSize.sm,
+    fontWeight: theme.typography.fontWeight.bold,
+    color: theme.colors.text.primary,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    minWidth: '32px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    minWidth: `${theme.controls.buttonSize}px`,
+    boxShadow: theme.shadows.sm,
+    transition: 'all 0.2s ease',
   };
 
   const containerStyle: React.CSSProperties = {
     position: 'absolute',
-    bottom: '20px',
-    right: '20px',
+    bottom: `${theme.controls.position.bottom}px`,
+    right: `${theme.controls.position.right}px`,
     display: 'flex',
     flexDirection: 'column',
-    background: 'white',
-    borderRadius: '6px',
-    padding: '4px',
-    boxShadow: '0 4px 8px rgba(0,0,0,0.15)',
+    background: theme.colors.surface,
+    borderRadius: `${theme.borderRadius.md}px`,
+    padding: `${theme.spacing.sm}px`,
+    boxShadow: theme.shadows.md,
     zIndex: 10,
+    border: `1px solid ${theme.colors.border}`,
   };
 
   return (
@@ -79,9 +84,9 @@ const Controls: React.FC<ControlsProps> = ({
         style={{
           ...buttonStyle,
           cursor: 'default',
-          fontSize: '10px',
-          color: '#666',
-          background: '#f8f9fa',
+          fontSize: theme.typography.fontSize.xs,
+          color: theme.colors.text.secondary,
+          background: theme.colors.background,
         }}
       >
         {Math.round(zoom * 100)}%

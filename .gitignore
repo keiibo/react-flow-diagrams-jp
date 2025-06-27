@@ -85,3 +85,4 @@ temp/
 # Personal notes and documentation
 CLAUDE.md
 docs/
+.cursor/

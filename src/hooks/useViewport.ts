@@ -1,16 +1,29 @@
 import { useState, useCallback } from "react";
 import { IViewport, IPosition } from "@/types";
 
+/**
+ * ビューポート操作のためのフックの戻り値
+ */
 interface UseViewportReturn {
+  /** 現在のビューポート状態 */
   viewport: IViewport;
+  /** ビューポート状態を直接設定する関数 */
   setViewport: (viewport: IViewport) => void;
+  /** ズームインする関数 */
   zoomIn: () => void;
+  /** ズームアウトする関数 */
   zoomOut: () => void;
+  /** ズームを1.0にリセットする関数 */
   resetZoom: () => void;
+  /** ビューを初期状態に戻す関数 */
   fitView: () => void;
+  /** 指定した距離だけパンする関数 */
   panBy: (delta: IPosition) => void;
+  /** 指定した点を中心にズームする関数 */
   zoomToPoint: (point: IPosition, newZoom: number) => void;
+  /** スクリーン座標をフロー座標に変換する関数 */
   screenToFlowPosition: (screenPos: IPosition) => IPosition;
+  /** フロー座標をスクリーン座標に変換する関数 */
   flowToScreenPosition: (flowPos: IPosition) => IPosition;
 }
 
@@ -18,6 +31,28 @@ const MIN_ZOOM = 0.1;
 const MAX_ZOOM = 2;
 const ZOOM_STEP = 0.1;
 
+/**
+ * ビューポートの状態とズーム・パン操作を管理するフック
+ *
+ * @description
+ * フロー図のビューポート操作（ズーム・パン）を統合的に管理し、
+ * Figmaライクな直感的な操作体験を提供します。
+ *
+ * @param initialViewport - 初期ビューポート状態（デフォルト: {x: 0, y: 0, zoom: 1}）
+ * @returns ビューポート操作のための関数群とstate
+ *
+ * @example
+ * ```tsx
+ * const { viewport, zoomIn, zoomOut, panBy } = useViewport();
+ *
+ * // ズーム操作
+ * <button onClick={zoomIn}>+</button>
+ * <button onClick={zoomOut}>-</button>
+ *
+ * // パン操作
+ * panBy({ x: 10, y: 10 });
+ * ```
+ */
 export const useViewport = (
   initialViewport: IViewport = { x: 0, y: 0, zoom: 1 }
 ): UseViewportReturn => {

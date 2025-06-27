@@ -1,11 +1,35 @@
 import React, { useRef, useCallback, useEffect, useState } from "react";
 import { IFlowProps, IPosition } from "@/types";
 import { useViewport, useDrag, useConnection } from "@/hooks";
+import { ThemeProvider, useFlowThemeSafe } from "@/contexts/ThemeContext";
 import Controls from "./Controls";
 import BezierEdge from "./BezierEdge";
 import NodeRenderer from "./NodeRenderer";
 
-const FlowCanvas: React.FC<IFlowProps> = ({
+/**
+ * インタラクティブなフロー図を表示するメインコンポーネント
+ *
+ * @description
+ * - ノードとエッジの表示・編集
+ * - ドラッグ&ドロップによるノード移動
+ * - ズーム・パン操作
+ * - ノード間の接続作成
+ * - カスタムノードタイプの対応
+ *
+ * @example
+ * ```tsx
+ * <FlowCanvas
+ *   nodes={[{ id: '1', position: { x: 100, y: 100 }, data: { label: 'Node 1' } }]}
+ *   edges={[]}
+ *   onNodesChange={setNodes}
+ *   onEdgesChange={setEdges}
+ * />
+ * ```
+ */
+/**
+ * FlowCanvasの内部実装（テーマ対応）
+ */
+const FlowCanvasImpl: React.FC<Omit<IFlowProps, 'theme'>> = ({
   nodes,
   edges,
   onNodesChange,
@@ -16,7 +40,10 @@ const FlowCanvas: React.FC<IFlowProps> = ({
   onPaneClick,
   onEdgeLabelChange,
   nodeTypes,
+  className,
+  style,
 }) => {
+  const theme = useFlowThemeSafe();
   const containerRef = useRef<HTMLDivElement>(null);
   const [internalNodes, setInternalNodes] = useState(nodes);
   const [internalEdges, setInternalEdges] = useState(edges);
@@ -249,15 +276,20 @@ const FlowCanvas: React.FC<IFlowProps> = ({
     <div
       ref={containerRef}
       data-flow-container
+      className={className}
       style={{
         width: "100%",
         height: "100%",
-        background: "#f8f9fa",
+        background: theme.colors.background,
         position: "relative",
         overflow: "hidden",
-        border: "1px solid #e9ecef",
+        border: `1px solid ${theme.colors.border}`,
         cursor: isDragging ? "grabbing" : "grab",
-        userSelect: "none", // テキスト選択を防ぐ
+        userSelect: "none",
+        fontFamily: theme.typography.fontFamily,
+        fontSize: theme.typography.fontSize.md,
+        color: theme.colors.text.primary,
+        ...style,
       }}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
@@ -297,7 +329,7 @@ const FlowCanvas: React.FC<IFlowProps> = ({
               <path
                 d={`M ${20 / viewport.zoom} 0 L 0 0 0 ${20 / viewport.zoom}`}
                 fill="none"
-                stroke="#e9ecef"
+                stroke={theme.colors.grid.line}
                 strokeWidth={1 / viewport.zoom}
               />
             </pattern>
@@ -333,8 +365,8 @@ const FlowCanvas: React.FC<IFlowProps> = ({
           {connectionPath && (
             <path
               d={connectionPath}
-              stroke="#007bff"
-              strokeWidth={2}
+              stroke={theme.colors.state.connecting}
+              strokeWidth={theme.edge.strokeWidth}
               fill="none"
               strokeDasharray="5,5"
               style={{ pointerEvents: "none" }}
@@ -365,25 +397,27 @@ const FlowCanvas: React.FC<IFlowProps> = ({
         onReset={resetZoom}
         zoom={viewport.zoom}
       />
-
-      {/* Development info */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: "10px",
-          left: "10px",
-          background: "rgba(255,255,255,0.9)",
-          padding: "8px",
-          borderRadius: "4px",
-          fontSize: "12px",
-          color: "#6c757d",
-        }}
-      >
-        Flow Diagram - {internalNodes.length} nodes, {internalEdges.length}{" "}
-        edges - Zoom: {Math.round(viewport.zoom * 100)}%
-      </div>
     </div>
   );
+};
+
+/**
+ * フロー図のメインコンポーネント
+ * テーマプロバイダーでラップして使用
+ */
+const FlowCanvas: React.FC<IFlowProps> = ({
+  theme,
+  ...props
+}) => {
+  if (theme) {
+    return (
+      <ThemeProvider initialTheme={theme as any}>
+        <FlowCanvasImpl {...props} />
+      </ThemeProvider>
+    );
+  }
+  
+  return <FlowCanvasImpl {...props} />;
 };
 
 export default FlowCanvas;

@@ -1,5 +1,6 @@
 import React, { useCallback, useRef } from "react";
 import { IHandle as HandleType } from "@/types";
+import { useFlowThemeSafe } from "@/contexts/ThemeContext";
 
 interface HandleProps extends HandleType {
   nodeId: string;
@@ -23,18 +24,21 @@ const Handle: React.FC<HandleProps> = ({
   onClick,
   offset = 5,
 }) => {
+  const theme = useFlowThemeSafe();
   const handleRef = useRef<HTMLDivElement>(null);
 
   const getPositionStyles = () => {
+    const handleSize = theme.node.handleSize;
     const baseStyles = {
       position: "absolute" as const,
-      width: "10px",
-      height: "10px",
-      background: "#007bff",
-      border: "2px solid white",
-      borderRadius: "50%",
+      width: `${handleSize}px`,
+      height: `${handleSize}px`,
+      background: theme.colors.handle.default,
+      border: `2px solid ${theme.colors.surface}`,
+      borderRadius: theme.borderRadius.full,
       cursor: "crosshair",
       zIndex: 100,
+      transition: "all 0.2s ease",
     };
 
     switch (position) {

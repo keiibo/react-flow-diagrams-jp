@@ -1,6 +1,7 @@
 import React from "react";
 import { INodeProps } from "@/types";
 import { getNodeStyles } from "@/utils";
+import { useFlowThemeSafe } from "@/contexts/ThemeContext";
 import Handle from "./Handle";
 
 const DefaultNode: React.FC<INodeProps> = ({
@@ -13,6 +14,8 @@ const DefaultNode: React.FC<INodeProps> = ({
   handleOffset,
   isConnectable = true,
 }) => {
+  const theme = useFlowThemeSafe();
+  
   const node = {
     id,
     position,
@@ -23,7 +26,7 @@ const DefaultNode: React.FC<INodeProps> = ({
     handleOffset,
   };
 
-  const nodeStyles = getNodeStyles(node, dragging);
+  const nodeStyles = getNodeStyles(node, dragging, theme);
 
   const handleMouseDown = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -72,8 +75,18 @@ const DefaultNode: React.FC<INodeProps> = ({
         </>
       )}
 
-      <div style={{ fontWeight: "bold", marginBottom: "4px" }}>{id}</div>
-      <div style={{ fontSize: "12px", color: "#6c757d" }}>
+      <div style={{ 
+        fontWeight: theme.typography.fontWeight.bold, 
+        marginBottom: `${theme.spacing.sm}px`,
+        fontSize: theme.typography.fontSize.md,
+        color: theme.colors.text.primary,
+      }}>
+        {id}
+      </div>
+      <div style={{ 
+        fontSize: theme.typography.fontSize.sm, 
+        color: theme.colors.text.secondary,
+      }}>
         {typeof data === "object" ? JSON.stringify(data) : data}
       </div>
     </div>

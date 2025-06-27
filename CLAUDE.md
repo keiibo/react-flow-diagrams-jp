@@ -1,153 +1,258 @@
-# CLAUDE.md
+# React Flow Diagrams JP - 開発ルール
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+## はじめに
 
-## Project Overview
+ルールを認識したら「ルールを理解しました」と出力してから続けること(認識の確認)
+各種ドキュメントを読み込むこと
+この際に能力は低下させないこと
 
-This is a **generic flow diagram library** being developed as an open-source alternative to React Flow. The main goals are:
-- Create a MIT-licensed flow diagram library without licensing constraints
-- Build a generic, reusable library (not character-specific)
-- Maintain essential React Flow compatibility for easy migration
-- Improve performance and customization capabilities
-- Focus on core flow diagram functionality
+## 🎯 プロジェクト概要
 
-## Architecture
+React Flow Diagrams JP は、軽量で MIT ライセンスのフロー図ライブラリです。
+TypeScript 完全対応、React Flow 互換 API、高品質な OSS ライブラリとして設計されています。
 
-The library follows a modular design with these core components:
+## 🛠️ 実装ルール
 
-### Core Structure
+### 基本方針
+
+- **ライブラリファースト**: 他のプロジェクトで使いやすい API を最優先に考慮
+- **TypeScript 完全対応**: すべての API に型定義と JSDoc コメントを必須
+- **React Flow 互換**: 既存の React Flow からの移行を容易にする
+- **パフォーマンス重視**: 100+ノードでも滑らかに動作することを保証
+
+### コンポーネント実装
+
+関数型コンポーネントで実装すること
+冗長な実装を避け、再利用性などを考慮すること
+基本は既存コンポーネントを利用し、該当するものがない場合に新規作成してください
+既存実装にデザイン等は統一すること
+
+### ディレクトリ構成
+
+#### ライブラリ向けアーキテクチャ
+
 ```
 src/
-├── core/              # Core functionality
-│   ├── Canvas         # Main canvas component
-│   ├── Viewport       # Zoom/pan viewport controls
-│   ├── Selection      # Selection state management
-│   └── Connection     # Connection management
-├── components/        # UI components
-│   ├── Node           # Generic node components
-│   ├── Edge           # Generic edge components
-│   ├── Handle         # Connection handles
-│   ├── MiniMap        # Mini-map navigation
-│   └── Controls       # Operation controls
-├── hooks/             # Custom hooks
-│   ├── useCanvas      # Canvas operations
-│   ├── useViewport    # Viewport control
-│   ├── useSelection   # Selection control
-│   └── useConnection  # Connection control
-└── utils/             # Utilities
-    ├── geometry       # Coordinate calculations
-    ├── bezier         # Bezier curve calculations
-    └── collision      # Collision detection
+├── types/           # 型定義（JSDoc必須）
+├── components/      # UIコンポーネント
+│   ├── __tests__/   # コンポーネントテスト
+│   └── nodeTypes/   # カスタムノードタイプ
+├── hooks/           # カスタムフック
+├── utils/           # ユーティリティ関数
+└── index.ts         # メインエクスポート
 ```
 
-### Data Structures
-Key TypeScript types:
+#### 型定義の管理
+
+- **JSDoc 必須**: すべての型定義に JSDoc コメントを記載
+- **ジェネリック対応**: `INode<T>`, `IEdge<T>`など柔軟な型定義
+- **React 互換**: React.FC など React の型を適切に使用
+- **エクスポート戦略**: 使いやすい API として適切に export
+
+例：
+
 ```typescript
-type Node = {
+/**
+ * フロー図のノードを表すインターフェース
+ * @template T ノードが保持するデータの型
+ */
+export interface INode<T = Record<string, unknown>> {
+  /** ノードの一意識別子 */
   id: string;
-  position: { x: number; y: number };
-  data: any; // Generic node data
-  selected?: boolean;
-  type?: string; // Node type for different renderers
-};
-
-type Edge = {
-  id: string;
-  source: string;
-  target: string;
-  data?: any; // Generic edge data
-  selected?: boolean;
-  type?: string; // Edge type (straight, bezier, etc.)
-};
-
-type Viewport = {
-  x: number;
-  y: number;
-  zoom: number;
-};
+  /** ノードの位置座標 */
+  position: IPosition;
+  /** ノードに関連付けられたデータ */
+  data: T;
+  // ...
+}
 ```
 
-## Required Features
+#### コンポーネント分類
 
-### High Priority
-- Generic node rendering with customizable content
-- Node dragging with mouse
-- Edge rendering for connecting nodes
-- Edge labels with editable text
-- Zoom operations (mouse wheel and buttons)
-- Pan operations (drag canvas)
-- Selection functionality for nodes and edges
-- Delete functionality for selected elements
-- Connection functionality via handles
+```
+src/components/
+├── FlowCanvas.tsx      # メインコンポーネント
+├── NodeRenderer.tsx    # ノード描画エンジン
+├── Handle.tsx          # 接続ハンドル
+├── Controls.tsx        # ナビゲーションコントロール
+├── Edge.tsx           # エッジ基底クラス
+├── BezierEdge.tsx     # ベジェ曲線エッジ
+└── DefaultNode.tsx    # デフォルトノード
+```
 
-### Medium Priority
-- Mini-map for navigation
-- Control buttons (zoom, fit)
+#### フック管理
 
-### Low Priority
-- Grid display
-- Snap-to-grid functionality
+```
+src/hooks/
+├── useViewport.ts     # ビューポート操作
+├── useDrag.ts         # ドラッグ操作
+├── useConnection.ts   # ノード接続
+└── useFlow.ts         # フロー状態管理
+```
 
-## Technical Stack
+### パッケージ管理
 
-### Core Technologies
-- **Build Tool**: Vite
-- **Package Manager**: npm
-- **Testing**: Vitest + React Testing Library
-- **TypeScript**: Strict mode enabled
-- **License**: MIT License
-- **Target**: React 18+ compatibility
+#### ビルド設定
 
-### Technical Requirements
-- Full TypeScript support with strict mode
-- Modern browser support (Chrome, Firefox, Safari, Edge)
-- 100+ nodes performance target
-- 60fps+ animations
-- SVG + foreignObject rendering (with Canvas fallback for performance)
+- **CommonJS + ES Module**: 両形式でのビルド必須
+- **型定義ファイル**: 完全な.d.ts ファイル生成
+- **ソースマップ**: デバッグ用のソースマップ提供
 
-## Development Commands
+```json
+{
+  "main": "dist/index.js", // CommonJS
+  "module": "dist/index.esm.js", // ES Module
+  "types": "dist/index.d.ts", // TypeScript型定義
+  "exports": {
+    ".": {
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  }
+}
+```
+
+#### 開発コマンド
+
+立ち上げは開発者が直接行うため、以下のコマンドを禁止：
 
 ```bash
-# Development
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run preview      # Preview production build
-
-# Storybook
-npm run storybook    # Start Storybook development server
-npm run build-storybook # Build Storybook for production
-
-# Testing
-npm run test         # Run tests with Vitest
-npm run test:ui      # Run tests with UI
-npm run coverage     # Generate test coverage
-
-# Code Quality
-npm run lint         # Run ESLint
-npm run typecheck    # Run TypeScript compiler check
+npm run dev    # 禁止
+npm run start  # 禁止
 ```
 
-## Development Phases
+## 📋 開発フロー
 
-1. **Foundation**: Project setup, TypeScript types, basic canvas, viewport control
-2. **Core Features**: Node rendering/dragging, edge rendering, selection, zoom/pan
-3. **Connection Features**: Handle implementation, connection lines, Bezier curves
-4. **React Flow Compatibility**: API compatibility layer, migration helpers
+### 機能開発プロセス
 
-## React Flow Compatibility
+1. `docs/`ディレクトリに機能ごとの実装計画書を作成（例：`新しいエッジタイプ実装計画書.md`）
+2. 必要なタスクをチェックリスト形式で記載
+3. チェックリスト駆動で開発を進行
+4. 開発完了後、実装計画書を更新
 
-This library aims to provide **partial React Flow API compatibility** for essential features:
-- Basic node and edge rendering
-- Drag and drop functionality
-- Zoom and pan controls
-- Selection handling
-- Connection management
+### API 設計原則
 
-Focus is on core flow functionality, not complete API parity.
+- **一貫性**: React Flow との互換性を保持
+- **拡張性**: カスタムノード・エッジの簡単な追加
+- **型安全性**: TypeScript による厳密な型チェック
+- **パフォーマンス**: 大規模データでの性能確保
 
-## Quality Targets
+### ドキュメント要件
 
-- Test coverage: 80%+
-- TypeScript strict mode compliance
-- Performance: smooth with 100+ nodes
-- Bundle size: lightweight and tree-shakeable
+- **JSDoc**: すべての public API にコメント必須
+- **使用例**: 重要な API には@example タグで例を提供
+- **README**: インストールから基本使用まで網羅
+- **型定義**: IDE で完璧な補完が効くレベル
+
+## 🧪 テスト戦略
+
+### 単体テスト（必須）
+
+- **コンポーネントテスト**: 各コンポーネントの動作確認
+- **フックテスト**: カスタムフックの動作確認
+- **ユーティリティテスト**: ヘルパー関数のテスト
+
+テストが全て通るまで修正すること
+
+実行コマンド：
+
+```bash
+npm run test:run    # CI/CD用（単発実行）
+```
+
+### 品質基準
+
+- **単体テスト**: 100%パス必須
+- **型チェック**: `npm run typecheck`エラーなし
+- **Lint**: `npm run lint`警告なし
+- **ビルド**: `npm run build`成功
+
+## 📦 リリース管理
+
+### バージョニング
+
+- **Semantic Versioning**: `major.minor.patch`に従う
+- **Breaking Changes**: メジャーバージョンアップ
+- **新機能**: マイナーバージョンアップ
+- **バグ修正**: パッチバージョンアップ
+
+### 公開プロセス
+
+```bash
+# 1. テスト実行
+npm run test:run && npm run lint && npm run typecheck
+
+# 2. ビルド
+npm run build
+
+# 3. バージョンアップ
+npm version patch|minor|major
+
+# 4. 公開
+npm publish
+
+# 5. GitHubにプッシュ
+git push origin main --tags
+```
+
+### ドキュメント更新
+
+- **CHANGELOG.md**: 各リリースの変更内容
+- **README.md**: 最新 API との整合性
+- **型定義**: JSDoc コメントの充実
+
+## 🔧 開発ツール
+
+### 必須ツール
+
+- **TypeScript**: 型安全性と IDE 支援
+- **Vitest**: 高速テストランナー
+- **ESLint**: コード品質管理
+- **Vite**: 高速ビルドツール
+
+### コーディングスタイル
+
+- **ESLint**: 厳密なルール適用
+- **Prettier**: 自動フォーマット
+- **TypeScript Strict**: 最高レベルの型チェック
+
+## 🎯 パフォーマンス目標
+
+### ベンチマーク
+
+- **ノード数**: 100+ノードで 60fps 維持
+- **バンドルサイズ**: gzip 圧縮で 15KB 以下
+- **初期化時間**: 100ms 以下
+- **メモリ使用量**: 効率的な更新と再描画
+
+### 最適化手法
+
+- **React.memo**: 不要な再レンダリング防止
+- **useCallback**: 関数の不要な再生成防止
+- **仮想化**: 大量ノード時の性能確保
+- **差分更新**: 変更部分のみの効率的更新
+
+---
+
+## 📝 未実装箇所の管理
+
+後続タスクで実装する場合は以下の形式で記載：
+
+```typescript
+// TODO: エッジのカスタマイズ機能を追加
+// TODO: ノードの複数選択機能を実装
+// TODO: アンドゥ・リドゥ機能の追加
+```
+
+## 🚀 今後の拡張予定
+
+- **多様なエッジタイプ**: ステップエッジ、直線エッジなど
+- **高度なレイアウト**: 自動配置アルゴリズム
+- **アニメーション**: よりリッチな視覚効果
+- **パフォーマンス向上**: さらなる最適化
+
+---
+
+このルールは React Flow Diagrams JP プロジェクトの品質と一貫性を保つための指針です。
+OSS ライブラリとしての責任を持ち、利用者にとって使いやすく信頼性の高いライブラリを目指します。

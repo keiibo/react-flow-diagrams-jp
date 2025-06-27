@@ -25,11 +25,13 @@ pnpm add react-flow-diagrams-jp
 
 ## Quick Start
 
+### 基本的な使用方法
+
 ```tsx
 import React, { useState } from 'react';
-import { FlowCanvas, INode, IEdge } from 'react-flow-diagrams-jp';
+import { ReactFlow, Node, Edge } from 'react-flow-diagrams-jp';
 
-const initialNodes: INode[] = [
+const initialNodes: Node[] = [
   {
     id: '1',
     position: { x: 100, y: 100 },
@@ -42,7 +44,7 @@ const initialNodes: INode[] = [
   },
 ];
 
-const initialEdges: IEdge[] = [
+const initialEdges: Edge[] = [
   {
     id: 'e1-2',
     source: '1',
@@ -56,7 +58,7 @@ function FlowDiagram() {
 
   return (
     &lt;div style={{ width: '100vw', height: '100vh' }}&gt;
-      &lt;FlowCanvas
+      &lt;ReactFlow
         nodes={nodes}
         edges={edges}
         onNodesChange={setNodes}
@@ -67,6 +69,71 @@ function FlowDiagram() {
 }
 
 export default FlowDiagram;
+```
+
+### プログラム制御の例
+
+```tsx
+import React, { useState, useCallback } from 'react';
+import { ReactFlow, Node, Edge, useReactFlow } from 'react-flow-diagrams-jp';
+
+function FlowWithControls() {
+  const [nodes, setNodes] = useState<Node[]>(initialNodes);
+  const [edges, setEdges] = useState<Edge[]>(initialEdges);
+  const reactFlow = useReactFlow();
+
+  const handleZoomIn = () => reactFlow.zoomIn();
+  const handleZoomOut = () => reactFlow.zoomOut();
+  const handleFitView = () => reactFlow.fitView();
+  const handleResetZoom = () => reactFlow.resetZoom();
+
+  // 特定のノードにズーム
+  const handleFocusNode = () => {
+    reactFlow.zoomToNode('1', nodes, 1.5);
+  };
+
+  // 複数ノードにフィット
+  const handleFitToNodes = () => {
+    reactFlow.fitToNodes(['1', '2'], nodes, 100);
+  };
+
+  return (
+    &lt;div style={{ width: '100vw', height: '100vh', position: 'relative' }}&gt;
+      {/* カスタムコントロール */}
+      &lt;div style={{
+        position: 'absolute',
+        top: 10,
+        left: 10,
+        zIndex: 1000,
+        display: 'flex',
+        gap: '8px',
+        flexDirection: 'column'
+      }}&gt;
+        &lt;button onClick={handleZoomIn}&gt;+ Zoom In&lt;/button&gt;
+        &lt;button onClick={handleZoomOut}&gt;- Zoom Out&lt;/button&gt;
+        &lt;button onClick={handleFitView}&gt;Fit View&lt;/button&gt;
+        &lt;button onClick={handleResetZoom}&gt;Reset Zoom&lt;/button&gt;
+        &lt;button onClick={handleFocusNode}&gt;Focus Node 1&lt;/button&gt;
+        &lt;button onClick={handleFitToNodes}&gt;Fit to Nodes&lt;/button&gt;
+      &lt;/div&gt;
+
+      &lt;ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={setNodes}
+        onEdgesChange={setEdges}
+        onConnect={(connection) =&gt; {
+          const newEdge: Edge = {
+            id: `e${connection.source}-${connection.target}`,
+            source: connection.source,
+            target: connection.target,
+          };
+          setEdges(prev =&gt; [...prev, newEdge]);
+        }}
+      /&gt;
+    &lt;/div&gt;
+  );
+}
 ```
 
 ## Basic Usage
@@ -170,58 +237,305 @@ React Flow Lite provides intuitive navigation:
 - **Node Drag**: Move individual nodes
 - **Handle Drag**: Create connections between nodes
 
-## API Reference
+## TypeScript Support
 
-### FlowCanvas Props
+React Flow Diagrams JP is built with TypeScript and provides comprehensive type definitions with JSDoc comments for excellent IDE support.
 
-| Prop                | Type                                       | Description                           |
-| ------------------- | ------------------------------------------ | ------------------------------------- |
-| `nodes`             | `INode[]`                                  | Array of nodes to display             |
-| `edges`             | `IEdge[]`                                  | Array of edges to display             |
-| `onNodesChange`     | `(nodes: INode[]) => void`                 | Callback when nodes change            |
-| `onEdgesChange`     | `(edges: IEdge[]) => void`                 | Callback when edges change            |
-| `onConnect`         | `(connection: Connection) => void`         | Callback when nodes are connected     |
-| `onNodeClick`       | `(event: MouseEvent, node: INode) => void` | Callback when a node is clicked       |
-| `onEdgeClick`       | `(event: MouseEvent, edge: IEdge) => void` | Callback when an edge is clicked      |
-| `onPaneClick`       | `(event: MouseEvent) => void`              | Callback when background is clicked   |
-| `onEdgeLabelChange` | `(edgeId: string, label: string) => void`  | Callback when edge label changes      |
-| `nodeTypes`         | `TNodeTypes`                               | Custom node component types           |
-| `edgeTypes`         | `TEdgeTypes`                               | Custom edge component types           |
-| `fitView`           | `boolean`                                  | Whether to fit view on initial render |
-| `fitViewOptions`    | `FitViewOptions`                           | Options for fit view behavior         |
+### Core Types
 
-### INode Interface
+#### INode<T>
 
 ```tsx
-interface INode&lt;T = any&gt; {
-  id: string;
-  position: IPosition;
-  data: T;
-  type?: string;
-  selected?: boolean;
-  shape?: 'rectangle' | 'square' | 'circle' | 'rounded';
-  handleOffset?: number;
-  draggable?: boolean;
-  selectable?: boolean;
-  connectable?: boolean;
-  width?: number;
-  height?: number;
+interface INode<T = Record<string, unknown>> {
+  id: string; // ノードの一意識別子
+  position: IPosition; // ノードの位置座標
+  data: T; // ノードに関連付けられたデータ
+  type?: string; // カスタムノードのタイプ名
+  selected?: boolean; // ノードが選択されているかどうか
+  // ... その他のプロパティ
 }
 ```
 
-### IEdge Interface
+#### IEdge<T>
 
 ```tsx
-interface IEdge&lt;T = any&gt; {
-  id: string;
-  source: string;
-  target: string;
-  sourceHandle?: string;
-  targetHandle?: string;
-  data?: T;
-  type?: string;
-  selected?: boolean;
-  animated?: boolean;
+interface IEdge<T = Record<string, unknown>> {
+  id: string; // エッジの一意識別子
+  source: string; // 接続元ノードのID
+  target: string; // 接続先ノードのID
+  sourceHandle?: string; // 接続元ハンドルのID
+  targetHandle?: string; // 接続先ハンドルのID
+  data?: T; // エッジに関連付けられたデータ
+  // ... その他のプロパティ
+}
+```
+
+#### INodeProps<T>
+
+```tsx
+interface INodeProps<T = Record<string, unknown>> {
+  id: string; // ノードの一意識別子
+  data: T; // ノードに関連付けられたデータ
+  position: IPosition; // ノードの位置座標
+  isConnectable?: boolean; // ハンドルを表示して接続を許可するかどうか
+  isDraggable?: boolean; // ドラッグ操作を許可するかどうか
+  // ... その他のプロパティ
+}
+```
+
+## API Reference
+
+### ReactFlow Component Props
+
+| Prop                | Type                                      | Description                         |
+| ------------------- | ----------------------------------------- | ----------------------------------- |
+| `nodes`             | `Node[]`                                  | Array of nodes to display           |
+| `edges`             | `Edge[]`                                  | Array of edges to display           |
+| `onNodesChange`     | `(nodes: Node[]) => void`                 | Callback when nodes change          |
+| `onEdgesChange`     | `(edges: Edge[]) => void`                 | Callback when edges change          |
+| `onConnect`         | `(connection: Connection) => void`        | Callback when nodes are connected   |
+| `onNodeClick`       | `(event: MouseEvent, node: Node) => void` | Callback when a node is clicked     |
+| `onEdgeClick`       | `(event: MouseEvent, edge: Edge) => void` | Callback when an edge is clicked    |
+| `onPaneClick`       | `(event: MouseEvent) => void`             | Callback when background is clicked |
+| `onEdgeLabelChange` | `(edgeId: string, label: string) => void` | Callback when edge label changes    |
+| `nodeTypes`         | `NodeTypes`                               | Custom node component types         |
+
+### useReactFlow Hook
+
+統合的なフロー操作を提供するメインフック：
+
+```tsx
+const reactFlow = useReactFlow();
+```
+
+#### 戻り値
+
+| Method                 | Type                                                           | Description                      |
+| ---------------------- | -------------------------------------------------------------- | -------------------------------- |
+| `viewport`             | `IViewport`                                                    | 現在のビューポート状態           |
+| `zoomIn`               | `() => void`                                                   | ズームイン                       |
+| `zoomOut`              | `() => void`                                                   | ズームアウト                     |
+| `resetZoom`            | `() => void`                                                   | ズームを 1.0 にリセット          |
+| `fitView`              | `() => void`                                                   | 全体が見えるようにフィット       |
+| `zoomToNode`           | `(nodeId: string, nodes: Node[], zoom?: number) => void`       | 指定ノードにズーム               |
+| `fitToNodes`           | `(nodeIds: string[], nodes: Node[], padding?: number) => void` | 複数ノードにフィット             |
+| `panTo`                | `(position: Position) => void`                                 | 指定位置にパン                   |
+| `screenToFlowPosition` | `(screenPos: Position) => Position`                            | スクリーン座標をフロー座標に変換 |
+| `flowToScreenPosition` | `(flowPos: Position) => Position`                              | フロー座標をスクリーン座標に変換 |
+| `getViewport`          | `() => IViewport`                                              | 現在のビューポート情報を取得     |
+| `isReady`              | `boolean`                                                      | フロー図が初期化済みかどうか     |
+
+### Core Interfaces
+
+#### Node Interface
+
+```tsx
+interface Node&lt;T = Record&lt;string, unknown&gt;&gt; {
+  id: string;                    // ノードの一意識別子
+  position: Position;            // ノードの位置座標
+  data: T;                      // ノードに関連付けられたデータ
+  type?: string;                // カスタムノードのタイプ名
+  selected?: boolean;           // ノードが選択されているかどうか
+  dragging?: boolean;           // ノードがドラッグ中かどうか
+  width?: number;               // ノードの幅（ピクセル）
+  height?: number;              // ノードの高さ（ピクセル）
+  shape?: "rectangle" | "square" | "circle" | "rounded";
+  handleOffset?: number;        // ハンドルのオフセット距離
+  draggable?: boolean;          // ドラッグ可能かどうか
+  selectable?: boolean;         // 選択可能かどうか
+  connectable?: boolean;        // 接続可能かどうか
+  deletable?: boolean;          // 削除可能かどうか
+}
+```
+
+#### Edge Interface
+
+```tsx
+interface Edge&lt;T = Record&lt;string, unknown&gt;&gt; {
+  id: string;                   // エッジの一意識別子
+  source: string;               // 接続元ノードのID
+  target: string;               // 接続先ノードのID
+  sourceHandle?: string;        // 接続元ハンドルのID
+  targetHandle?: string;        // 接続先ハンドルのID
+  data?: T;                    // エッジに関連付けられたデータ
+  type?: string;               // カスタムエッジのタイプ名
+  selected?: boolean;          // エッジが選択されているかどうか
+  animated?: boolean;          // エッジがアニメーション表示されるかどうか
+}
+```
+
+#### Position Interface
+
+```tsx
+interface Position {
+  x: number; // X座標
+  y: number; // Y座標
+}
+```
+
+## Advanced Examples
+
+### 複雑なフロー図の作成
+
+```tsx
+import React, { useState, useCallback } from 'react';
+import { ReactFlow, Node, Edge, useReactFlow, NodeProps, Handle } from 'react-flow-diagrams-jp';
+
+// プロセスノードの型定義
+interface ProcessNodeData {
+  title: string;
+  status: 'pending' | 'running' | 'completed' | 'error';
+  description?: string;
+}
+
+// カスタムプロセスノード
+const ProcessNode = ({ data, selected }: NodeProps&lt;ProcessNodeData&gt;) =&gt; {
+  const statusColors = {
+    pending: '#ffc107',
+    running: '#007bff',
+    completed: '#28a745',
+    error: '#dc3545'
+  };
+
+  return (
+    &lt;div style={{
+      padding: '16px',
+      border: `2px solid ${statusColors[data.status]}`,
+      borderRadius: '12px',
+      background: 'white',
+      boxShadow: selected ? '0 0 15px rgba(0,123,255,0.4)' : '0 4px 8px rgba(0,0,0,0.1)',
+      minWidth: '180px',
+      position: 'relative'
+    }}&gt;
+      &lt;Handle id="input" type="target" position="left" /&gt;
+      &lt;Handle id="output" type="source" position="right" /&gt;
+
+      &lt;div style={{
+        position: 'absolute',
+        top: '8px',
+        right: '8px',
+        width: '12px',
+        height: '12px',
+        borderRadius: '50%',
+        background: statusColors[data.status]
+      }} /&gt;
+
+      &lt;h4 style={{ margin: '0 0 8px 0', fontSize: '16px' }}&gt;{data.title}&lt;/h4&gt;
+      {data.description && (
+        &lt;p style={{ margin: 0, fontSize: '14px', color: '#666' }}&gt;{data.description}&lt;/p&gt;
+      )}
+    &lt;/div&gt;
+  );
+};
+
+function ProcessFlowApp() {
+  const [nodes, setNodes] = useState&lt;Node&lt;ProcessNodeData&gt;[]&gt;([
+    {
+      id: '1',
+      type: 'process',
+      position: { x: 100, y: 100 },
+      data: { title: 'データ取得', status: 'completed', description: 'APIからデータを取得' }
+    },
+    {
+      id: '2',
+      type: 'process',
+      position: { x: 350, y: 100 },
+      data: { title: 'データ処理', status: 'running', description: 'データの変換・加工' }
+    },
+    {
+      id: '3',
+      type: 'process',
+      position: { x: 600, y: 100 },
+      data: { title: 'レポート生成', status: 'pending', description: 'PDF レポートの作成' }
+    }
+  ]);
+
+  const [edges, setEdges] = useState&lt;Edge[]&gt;([
+    { id: 'e1-2', source: '1', target: '2', sourceHandle: 'output', targetHandle: 'input' },
+    { id: 'e2-3', source: '2', target: '3', sourceHandle: 'output', targetHandle: 'input' }
+  ]);
+
+  const nodeTypes = { process: ProcessNode };
+  const reactFlow = useReactFlow();
+
+  const updateNodeStatus = useCallback((nodeId: string, status: ProcessNodeData['status']) =&gt; {
+    setNodes(prev =&gt; prev.map(node =&gt;
+      node.id === nodeId
+        ? { ...node, data: { ...node.data, status } }
+        : node
+    ));
+  }, []);
+
+  return (
+    &lt;div style={{ width: '100vw', height: '100vh', position: 'relative' }}&gt;
+      &lt;div style={{ position: 'absolute', top: 10, left: 10, zIndex: 1000 }}&gt;
+        &lt;button onClick={() =&gt; updateNodeStatus('2', 'completed')}&gt;
+          完了: データ処理
+        &lt;/button&gt;
+        &lt;button onClick={() =&gt; updateNodeStatus('3', 'running')}&gt;
+          開始: レポート生成
+        &lt;/button&gt;
+        &lt;button onClick={() =&gt; reactFlow.fitView()}&gt;全体表示&lt;/button&gt;
+      &lt;/div&gt;
+
+      &lt;ReactFlow
+        nodes={nodes}
+        edges={edges}
+        nodeTypes={nodeTypes}
+        onNodesChange={setNodes}
+        onEdgesChange={setEdges}
+      /&gt;
+    &lt;/div&gt;
+  );
+}
+```
+
+### 座標変換とマウス操作
+
+```tsx
+function InteractiveFlow() {
+  const [nodes, setNodes] = useState&lt;Node[]&gt;(initialNodes);
+  const [mousePosition, setMousePosition] = useState&lt;{ screen: Position; flow: Position }&gt;();
+  const reactFlow = useReactFlow();
+
+  const handleMouseMove = useCallback((event: React.MouseEvent) =&gt; {
+    const screenPos = { x: event.clientX, y: event.clientY };
+    const flowPos = reactFlow.screenToFlowPosition(screenPos);
+    setMousePosition({ screen: screenPos, flow: flowPos });
+  }, [reactFlow]);
+
+  const handlePaneDoubleClick = useCallback((event: React.MouseEvent) =&gt; {
+    const position = reactFlow.screenToFlowPosition({
+      x: event.clientX,
+      y: event.clientY
+    });
+
+    const newNode: Node = {
+      id: `node-${Date.now()}`,
+      position,
+      data: { label: '新しいノード' }
+    };
+
+    setNodes(prev =&gt; [...prev, newNode]);
+  }, [reactFlow]);
+
+  return (
+    &lt;div style={{ width: '100vw', height: '100vh', position: 'relative' }}&gt;
+      {mousePosition && (
+        &lt;div style={{ position: 'absolute', top: 10, right: 10, zIndex: 1000, background: 'white', padding: '8px', borderRadius: '4px' }}&gt;
+          Screen: ({mousePosition.screen.x.toFixed(0)}, {mousePosition.screen.y.toFixed(0)}) &lt;br/&gt;
+          Flow: ({mousePosition.flow.x.toFixed(0)}, {mousePosition.flow.y.toFixed(0)})
+        &lt;/div&gt;
+      )}
+
+      &lt;ReactFlow
+        nodes={nodes}
+        onNodesChange={setNodes}
+        onPaneDoubleClick={handlePaneDoubleClick}
+        onMouseMove={handleMouseMove}
+      /&gt;
+    &lt;/div&gt;
+  );
 }
 ```
 
@@ -229,32 +543,64 @@ interface IEdge&lt;T = any&gt; {
 
 ### Custom Node Types
 
-Create custom node components:
+カスタムノードコンポーネントの作成：
 
 ```tsx
-import { INodeProps } from 'react-flow-diagrams-jp';
+import { NodeProps, Handle } from 'react-flow-diagrams-jp';
 
-const CustomNode = ({ data, selected }: INodeProps) =&gt; {
+// カスタムノードの型定義
+interface CustomNodeData {
+  title: string;
+  description: string;
+  color?: string;
+}
+
+const CustomNode = ({ data, selected }: NodeProps&lt;CustomNodeData&gt;) =&gt; {
   return (
     &lt;div
       style={{
-        padding: '10px',
-        border: selected ? '2px solid blue' : '1px solid gray',
-        borderRadius: '4px',
-        background: 'white',
+        padding: '12px',
+        border: selected ? '2px solid #007bff' : '1px solid #dee2e6',
+        borderRadius: '8px',
+        background: data.color || 'white',
+        boxShadow: selected ? '0 0 10px rgba(0,123,255,0.3)' : '0 2px 4px rgba(0,0,0,0.1)',
+        minWidth: '200px',
       }}
     &gt;
-      &lt;strong&gt;{data.title}&lt;/strong&gt;
-      &lt;p&gt;{data.description}&lt;/p&gt;
+      {/* 接続ハンドル */}
+      &lt;Handle id="top" type="source" position="top" /&gt;
+      &lt;Handle id="bottom" type="target" position="bottom" /&gt;
+
+      &lt;div style={{ fontWeight: 'bold', marginBottom: '8px', fontSize: '16px' }}&gt;
+        {data.title}
+      &lt;/div&gt;
+      &lt;div style={{ fontSize: '14px', color: '#6c757d' }}&gt;
+        {data.description}
+      &lt;/div&gt;
     &lt;/div&gt;
   );
 };
 
-const nodeTypes: TNodeTypes = {
+// ノードタイプの定義
+const nodeTypes: NodeTypes = {
   custom: CustomNode,
 };
 
-&lt;FlowCanvas
+// 使用例
+const nodes: Node&lt;CustomNodeData&gt;[] = [
+  {
+    id: '1',
+    type: 'custom',
+    position: { x: 100, y: 100 },
+    data: {
+      title: 'カスタムノード',
+      description: 'これは独自デザインのノードです',
+      color: '#f8f9fa'
+    }
+  }
+];
+
+&lt;ReactFlow
   nodes={nodes}
   edges={edges}
   nodeTypes={nodeTypes}
