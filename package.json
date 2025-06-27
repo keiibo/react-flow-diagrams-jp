@@ -1,6 +1,6 @@
 {
   "name": "react-flow-diagrams-jp",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "A lightweight, MIT-licensed flow diagram library for building interactive node-based diagrams",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
