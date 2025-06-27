@@ -1,11 +1,23 @@
 import React from "react";
 import { IEdge as EdgeType } from "@/types";
 
+/**
+ * エッジコンポーネントのプロパティ
+ */
 interface EdgeProps {
+  /** 表示するエッジの情報 */
   edge: EdgeType;
+  /** エッジクリック時のコールバック関数 */
   onClick?: (event: React.MouseEvent, edge: EdgeType) => void;
 }
 
+/**
+ * 基本的なエッジコンポーネント
+ * 2つの固定点を結ぶシンプルな直線を描画します
+ *
+ * @param props - エッジコンポーネントのプロパティ
+ * @returns エッジを表すSVG line要素
+ */
 const Edge: React.FC<EdgeProps> = ({ edge, onClick }) => {
   return (
     <line

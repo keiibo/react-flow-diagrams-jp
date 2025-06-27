@@ -1,11 +1,23 @@
 import React from "react";
 import { INode as NodeType } from "@/types";
 
+/**
+ * ノードコンポーネントのプロパティ
+ */
 interface NodeProps {
+  /** 表示するノードの情報 */
   node: NodeType;
+  /** ノードクリック時のコールバック関数 */
   onClick?: (event: React.MouseEvent, node: NodeType) => void;
 }
 
+/**
+ * 基本的なノードコンポーネント
+ * ノードのID、データ、位置情報を表示するシンプルなコンポーネントです
+ *
+ * @param props - ノードコンポーネントのプロパティ
+ * @returns ノードを表すdiv要素
+ */
 const Node: React.FC<NodeProps> = ({ node, onClick }) => {
   return (
     <div

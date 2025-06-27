@@ -2,17 +2,33 @@ import React, { useCallback, useRef } from "react";
 import { IHandle as HandleType } from "@/types";
 import { useFlowThemeSafe } from "@/contexts/ThemeContext";
 
+/**
+ * ハンドルコンポーネントのプロパティ
+ */
 interface HandleProps extends HandleType {
+  /** ハンドルが属するノードのID */
   nodeId: string;
+  /** 接続開始時のコールバック関数 */
   onConnectionStart?: (
     nodeId: string,
     handleId: string,
     position: { x: number; y: number }
   ) => void;
+  /** 接続終了時のコールバック関数 */
   onConnectionEnd?: (nodeId: string, handleId: string) => void;
+  /** ハンドルクリック時のコールバック関数 */
   onClick?: (event: React.MouseEvent) => void;
 }
 
+/**
+ * ハンドルコンポーネント
+ *
+ * ノードの接続ポイントとして機能し、ドラッグ操作によるエッジ作成をサポートします。
+ * テーマシステムに対応し、ノードの4方向（上下左右）に配置可能です。
+ *
+ * @param props - ハンドルのプロパティ
+ * @returns ハンドルを表すdiv要素
+ */
 const Handle: React.FC<HandleProps> = ({
   id,
   type,

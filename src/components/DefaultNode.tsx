@@ -4,6 +4,15 @@ import { getNodeStyles } from "@/utils";
 import { useFlowThemeSafe } from "@/contexts/ThemeContext";
 import Handle from "./Handle";
 
+/**
+ * デフォルトノードコンポーネント
+ *
+ * テーマシステムに対応し、4方向のハンドルを持つスタンダードなノードコンポーネントです。
+ * ドラッグ、選択、接続などの基本的なノード機能をサポートします。
+ *
+ * @param props - ノードのプロパティ
+ * @returns スタイル適用済みのノード要素
+ */
 const DefaultNode: React.FC<INodeProps> = ({
   id,
   data,
